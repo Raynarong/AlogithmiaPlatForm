@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	 <constant name="struts.devMode" value="false" /><!--显示详细的错误信息，开发者模式-->
+	 <!--<constant name="struts.multipart.saveDir" value="/tmp"></constant>指定上传文件的临时目录-->
+	 <!--<constant name="struts.multipart.maxSize" value="9000000"/> 指定Struts 2文件上传中整个请求内容允许的最大字节数 默认为2M  -->
+	 
+	 <package name="ajax_code" extends="json-default">
+		<!-- 文件上传 -->
+		<action name="addJarAction" class="com.web.action.AddJarAction" method="upload">
+			<result type="json" name="success">
+				<param name="contentType">text/html</param>
+			</result>
+		</action>
+		
+		<action name="addInputFileAction" class="alg.base.action.AddAlgoAction" method="addInputFile">
+			<result type="json" name="success">
+				<param name="contentType">text/html</param>
+			</result>
+		</action>
+		
+		<action name="uploadFileAction" class="alg.base.action.FileManageAction" method="uploadFile">
+			<result type="json" name="success">
+				<param name="contentType">text/html</param>
+				<param name="flag">${flag}</param>
+				<param name="url">${url}</param>
+				<param name="collectionName">${collectionName}</param>
+				<param name="collectionId">${collectionId}</param>
+			</result>
+		</action>
+		
+	</package>
+	
+	 <package name="default" namespace="/" extends="struts-default">
+	 <action name="algthmAction*" class="alg.base.action.AlgorithmAction" method="{1}">
+     </action>
+     <action name="bonusAction*" class="alg.base.action.BonusAction" method="{1}">
+     </action>
+    <action name="comtAction*" class="alg.base.action.CommentAction" method="{1}">
+    </action>
+    <action name="deleteFileAction" class="alg.base.action.FileManageAction" method="deleteFile">
+    </action>
+    <action name="feedbackAction" class="alg.base.action.FeedbackAction" method="feedback">
+    	<result type="redirect" name="success">
+    		<param name="location">/feedback.jsp</param>
+    		<param name="flag">true</param>
+    	</result>
+    </action>
+	<action name="downloadFileAction" class="com.web.file.FileManageDownload">
+	 	<result name="success" type="stream">
+	 		<param name="contentType">text/plain</param>
+	 		<param name="contentDisposition">attachment;fileName="${fileName}"</param>
+	 		<param name="inputName">downloadFile</param>
+	 		<param name="bufferSize">1024</param>
+	 	</result>
+	 </action>
+	 <action name="loadAboutUsAction" class="alg.base.action.AdminCenterAction" method="loadAboutUs"></action>
+	 <action name="aboutUsAction" class="alg.base.action.AdminCenterAction" method="aboutUs"></action>
+	 <action name="modifyTypeAction" class="alg.base.action.AdminCenterAction" method="modifyType"></action>
+	 <action name="deleteTypeAction" class="alg.base.action.AdminCenterAction" method="deleteType"></action>
+	 <action name="addTypeAction" class="alg.base.action.AdminCenterAction" method="addType"></action>
+	 <action name="getTypeListAction" class="alg.base.action.AdminCenterAction" method="getTypeList"></action>
+	 <action name="deleteCollectionAction" class="alg.base.action.FileManageAction" method="deleteCollection"></action>
+     <action name="showFileListAction" class="alg.base.action.FileManageAction" method="showFileList"></action>
+     <action name="showCollectionAction" class="alg.base.action.FileManageAction" method="showCollection"></action>
+     <action name="addCollectionAction" class="alg.base.action.FileManageAction" method="addCollection"></action>
+     <action name="requestFileAction" class="alg.base.action.FileManageAction" method="requestFile"></action>
+     <action name="responseFileAction" class="alg.base.action.FileManageAction" method="responseFile"></action>
+     <action name="setSelectAction" class="alg.base.action.EditAlgoAction" method="setSelect"></action>
+     <action name="limitsControlAction" class="alg.base.action.EditAlgoAction" method="limitsControl"></action>
+     <action name="deleteTagAction" class="alg.base.action.EditAlgoAction" method="deleteTag"></action>
+     <action name="addTagAction" class="alg.base.action.EditAlgoAction" method="addTag"></action>
+     <action name="showTagAction" class="alg.base.action.EditAlgoAction" method="showTag"></action>
+     <action name="deleteAlgoAction" class="alg.base.action.EditAlgoAction" method="deleteAlgo">
+     	<result name="success" type="redirect">
+     		<param name="location">/userCenter.jsp</param>
+     	</result>
+     </action>
+     <action name="editAlgoAction" class="alg.base.action.EditAlgoAction" method="editAlgo"></action>
+     <action name="setVisitTimes" class="alg.base.action.AlgorithmAction" method="setVisitTimes"></action>
+     <action name="setTabDetail" class="alg.base.action.AlgorithmAction" method="getUserName"></action>
+	 <action name="saveCompile" class="com.web.action.SaveCompileAction" method="save_compile"></action>
+	 <action name="testAction" class="com.web.action.AlgoTestAciton" method="testAlgo"></action>
+	 <action name="getAlgoLengthAction" class="alg.base.action.AddAlgoAction" method="getAlgoLength"></action>
+	 <action name="setAlgoAction" class="alg.base.action.AddAlgoAction" method="setAlgo"></action>
+	 <action name="checkAlgoAction" class="alg.base.action.AddAlgoAction" method="checkAlgo"></action>
+	 <action name="publishAlgoAction" class="alg.base.action.AddAlgoAction" method="publishAlgo"></action>
+	 <action name="getUserbeanAction" class="alg.base.action.AddAlgoAction" method="getUserBean"></action>
+	 <action name="readInputFileAction" class="alg.base.action.AddAlgoAction" method="readInputFile"></action>
+	 <action name="getAlogCodeAction" class="alg.base.action.ViewSourceAction" method="viewSource"></action>
+	 <action name="viewSourceAction" class="alg.base.action.ViewSourceAction" method="dispatcher">
+	 	<result name="success" type="redirect">
+	 		<param name="location">/viewSource.jsp</param>
+	 	</result>
+	 	<result	name="modi" type="redirect"> 
+	 		<param name="location">/algoAdd.jsp</param>
+	 		<param name="flag">${flag}</param>
+	 	</result>
+	 </action>
+	 <action name="readJarAction" class="alg.base.action.ViewSourceAction" method="readJar"></action>
+	 <action name="deleteInputFile" class="alg.base.action.AddAlgoAction" method="deleteInputFlie"></action>
+	 <action name="runInputFile" class="com.web.action.RunInputFileAction" method="runInputFile"></action>
+	 <action name="FileDownload" class="com.web.file.FileDownload">
+	 	<result name="success" type="stream">
+	 		<param name="contentType">text/plain</param>
+	 		<param name="contentDisposition">attachment;fileName="${fileName}"</param>
+	 		<param name="inputName">downloadFile</param>
+	 		<param name="bufferSize">1024</param>
+	 	</result>
+	 </action>
+	 	  
+	 <action name="login" class="alg.base.action.LoginAction" >
+	<result  type="redirect" name="success">/search.jsp</result>
+	<result   name="login">/Signup.jsp</result>
+	</action>
+	 <action name="resetpwd" class="alg.base.action.LoginAction" method="resetpwd"> </action>
+	 <action name="checkLink" class="alg.base.action.LoginAction" method="checkResetLink"> 
+	 
+	 </action>
+	 <action name="Register" class="alg.base.action.RegisterAction" >
+		<result  type="redirect" name="success">/search.jsp</result>
+		<result  type="redirect" name="false">/register.jsp</result>
+	</action>
+	<action name="loginJudgeName" class="alg.base.action.RegisterAction"  method="judgeRename">
+	</action>
+	<action name="Changpwd" class="alg.base.action.RegisterAction"  method="Changpwd">
+	</action>
+	<action name="Resetpwd" class="alg.base.action.RegisterAction"  method="Resetpwd">
+	</action>
+	<action name="changeInfor" class="alg.base.action.RegisterAction"  method="changeInfor">
+	</action>
+	
+	<action name="judgeMail" class="alg.base.action.RegisterAction"  method="judgeMail">
+	</action>
+		<action name="clear_session" class="alg.base.action.LoginAction"  method="clear_session">
+	</action>
+	
+		<action name="showTraderecord" class="alg.base.action.tradeAction"  method="showTraderecord">
+	</action>
+		<action name="showCreditRecord" class="alg.base.action.tradeAction"  method="showCreditRecord">
+	</action>
+		<action name="totalVisitor" class="alg.base.action.tradeAction"  method="totalVisitor">
+	</action>
+	
+		<action name="SearchAlgoAction" class="alg.base.action.SearchAlgoAction" method="Fetch_j">
+	</action>
+	
+		<action name="AlgthmTagsAction*" class="alg.base.action.TagsAction" method="{1}">
+	</action>
+	
+
+	<action name="TagsActionFetch_ByTag"  class="alg.base.action.TagSearchAction" method="Fetch_ByTag">
+	</action>
+	
+	<action name="MatchTagsAction" class="alg.base.action.TagsAction" method="matchTags">
+	</action>
+	
+	<action name="SearchAlgoInTagsAction" class="alg.base.action.TagSearchAction" method="Fetch_inTags">
+	</action>
+	
+	<action name="algTypeAction" class="alg.base.action.AlgorithmAction" method="getAlgType">
+	</action>
+	
+	<action name="TypeSearchAction" class="alg.base.action.TypeSearchAction" method="fetch_ByType">
+	</action>
+	
+	<action name="SearchAlgoInTypesAction" class="alg.base.action.TypeSearchAction" method="fetch_Intype">
+	</action>
+	
+	<action name="message_number" class="alg.base.action.PushAction" method="allNum"> </action>
+	<action name="message_list" class="alg.base.action.PushAction" method="fetchList"> </action>
+
+	
+	<action name="testActionOnline" class="com.web.action.AlgoTestAciton" method="testAlgoOnline">
+	</action>
+	
+	<action name="commentListAction" class="alg.base.action.CommentListAction" method="getComment">
+	</action>
+	
+	<action name="setFlag" class="alg.base.action.CommentAction" method="setFlag">
+	</action>
+	
+	<action name="respondActionAdd" class="alg.base.action.RespondAction" method="AddRespond">
+	</action>
+	
+	<action name="RespondListAction" class="alg.base.action.CommentListAction" method="getRespond">
+	</action>
+	
+	<action name="CreateReward" class="alg.base.action.CreateRewardAction" method="createReward">
+	</action>
+	
+	<action name="BonusActionFetch_Byid" class="alg.base.action.BonusAction" method="Fetch_Byid">
+	</action>
+	
+	<action name="userAlgoListAction" class="alg.base.action.RespondBonusAction" method="showAlgNames">
+	</action>
+	
+	<action name="respondBonusAction" class="alg.base.action.RespondBonusAction" method="addRespond">
+	</action>
+	
+	<action name="BonusRespondActionFetch_Byid" class="alg.base.action.RespondBonusAction" method="bonusRespondList">
+	</action>
+	
+	<action name="SearchBonusAction"  class="alg.base.action.BonusAction" method="searchBonus">
+	</action>
+
+</package>
+</struts>

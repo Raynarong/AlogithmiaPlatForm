@@ -1,0 +1,147 @@
+package com.web.action;
+
+import java.io.PrintWriter;
+import java.sql.ResultSet;
+
+import javax.servlet.http.HttpSession;
+
+import org.apache.struts2.ServletActionContext;
+
+import alg.base.bean.Algorithm;
+import alg.base.util.ConfigurationConstant;
+import alg.base.util.DatabaseTool;
+
+import com.web.test.TestClient;
+
+public class AlgoTestAciton {
+	
+	private String line;
+	
+	private String requestSource;
+	
+	private String user_name;
+
+	public String getUser_name() {
+		return user_name;
+	}
+
+	public void setUser_name(String user_name) {
+		this.user_name = user_name;
+	}
+
+	public String getRequestSource() {
+		return requestSource;
+	}
+
+	public void setRequestSource(String requestSource) {
+		this.requestSource = requestSource;
+	}
+
+	public String getLine() {
+		return line;
+	}
+
+	public void setLine(String line) {
+		this.line = line;
+	}
+	
+	private String[] algoId;
+	
+	
+	public String[] getAlgoId() {
+		return algoId;
+	}
+
+	public void setAlgoId(String[] algoId) {
+		this.algoId = algoId;
+	}
+
+	public void testAlgo() throws Exception
+	{
+		
+		line = new String(line.getBytes("iso8859_1"), "utf-8");
+		
+		HttpSession session = ServletActionContext.getRequest().getSession();
+		String classStr = "";
+		if("algoAdd".equals(requestSource))//算法添加页面调用
+		{
+			classStr = session.getAttribute("user") + "." + session.getAttribute("algorithm_name") + "." + session.getAttribute("algorithm_name");
+		}
+		else if("viewSource".equals(requestSource))//查看源代码页面调用
+		{
+			classStr = session.getAttribute("user_name") + "." + session.getAttribute("algorithm_name") + "." + session.getAttribute("algorithm_name");
+		}
+		
+		
+//		TestClient testClient = new TestClient("http://localhost:8080/AlogServer/servlet/HelloworldServlet", classStr, line);
+		TestClient testClient = new TestClient(ConfigurationConstant.ALOGSERVER_URL + "/servlet/HelloworldServlet", classStr, line);
+
+		String result = "";
+		
+		try {
+			result = testClient.callTest();
+			System.out.println(result);
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			result = e.getMessage();
+		}
+		
+		PrintWriter out = ServletActionContext.getResponse().getWriter();
+		out.println(result);
+		out.flush();
+	}
+	
+	
+	//算法详情界面的在线测试
+	public void testAlgoOnline() throws Exception
+	{
+		//HttpSession session = ServletActionContext.getRequest().getSession();
+		//String algoId = session.getAttribute("algorithm_id").toString();
+		String algo_id = algoId[0];
+		String sql = "select user_name,algorithm_name from algorithm_table,users where algorithm_table.algorithm_id=? and algorithm_table.user_id=users.user_id"; 
+		String p[] = {algo_id};
+		ResultSet rs = DatabaseTool.query(sql, p);
+		String user_name;
+		String algorithm_name;
+		Algorithm al = new Algorithm();
+		while(rs.next()){
+			al.setUser_name(rs.getString("user_name"));
+			al.setAlgorithm_name(rs.getString("algorithm_name"));
+		}
+		user_name = al.getUser_name();
+		algorithm_name = al.getAlgorithm_name();
+		line = new String(line.getBytes("iso8859_1"), "utf-8");
+		
+		
+		String classStr = "";
+		if("algoAdd".equals(requestSource))//算法添加页面调用
+		{
+			classStr = user_name + "." + algorithm_name + "." + algorithm_name;
+		}
+		else if("viewSource".equals(requestSource))//查看源代码页面调用
+		{
+			classStr = user_name + "." + algorithm_name + "." + algorithm_name;
+		}
+		
+		
+//		TestClient testClient = new TestClient("http://localhost:8080/AlogServer/servlet/HelloworldServlet", classStr, line);
+		TestClient testClient = new TestClient(ConfigurationConstant.ALOGSERVER_URL + "/servlet/HelloworldServlet", classStr, line);
+
+		String result = "";
+		
+		try {
+			result = testClient.callTest();
+			//System.out.println(result);
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			result = e.getMessage();
+		}
+		
+		PrintWriter out = ServletActionContext.getResponse().getWriter();
+		out.println(result);
+		out.flush();
+	}
+	
+}

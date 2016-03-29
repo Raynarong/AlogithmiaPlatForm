@@ -1,0 +1,36 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@page import="context.M"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://"
+			+ request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+%>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+	<head>
+		<base href="<%=basePath%>">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>算法交易服务平台</title>
+
+		<link rel="stylesheet" type="text/css" href="resources/bootstrap/css/bootstrap.css" />
+		<link rel="stylesheet" type="text/css" href="resources/font-awesome/css/font-awesome.css" />
+		<link rel="stylesheet" type="text/css" href="resources/css/local.css" />
+		
+		<link rel="stylesheet" type="text/css" href="resources/css/shieldui-all.min.css" />
+		<link rel="stylesheet" type="text/css" href="resources/css/all.min.css" />
+		<link rel="stylesheet" type="text/css" href="resources/css/easyui.css">
+
+		<script type="text/javascript" src="resources/js/jquery-1.10.2.min.js"></script>
+		<script type="text/javascript" src="resources/bootstrap/js/bootstrap.js"></script>
+
+		
+		<script type="text/javascript" src="resources/js/shieldui-all.min.js"></script>
+		<script type="text/javascript" src="resources/js/gridData.js"></script>
+		<script type="text/javascript" src="resources/js/comet4j.js"></script>
+	
+
+
+	</head>
+	<body>

@@ -1,0 +1,341 @@
+<%@ page contentType="text/html;charset=utf-8"%>
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+<%@ page language="java" import="alg.base.service.*" %>
+<%@ page language="java" import="alg.base.bean.*" %>
+<%@page import="context.M"%>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+
+<jsp:include page="<%=M.j_head%>">
+	<jsp:param name="page-title" value="Scale Manage" />
+</jsp:include>
+<jsp:include page="<%=M.j_left%>" />
+
+  <script type="text/javascript">
+
+function searchResult(){
+	$('.algList').empty();
+	var input = document.getElementById("searchKeywords");
+	var searchAlgo = input.value;
+	$.post('SearchAlgoAction', {"searchAlgo":searchAlgo}, cuIndex_search);
+}
+var total_pages;
+var cu_index;
+
+function cuIndex_search(data) {
+	var obj = eval('(' + data + ')');
+	var currentIndex = obj.currentIndex;
+	var totalpage = obj.totalPage;
+	cu_index = currentIndex;
+	total_pages =totalpage;
+	//alert(total_pages);
+	var algsList = obj.cuArrAlgs;
+	cuIndex_readyView(algsList);
+}
+
+function cuIndex_readyView(obj) {
+	for ( var i = 0; i < obj.length; i++) {
+	$('.algList').append(//当前页算法列表
+			'<h3><a href="algoView.jsp?alg_id='+obj[i].algorithm_id+'" style="text-decoration:none">'
+			+obj[i].algorithm_name+'</a><small> <a href="uesrCenter.jsp?username='
+			+obj[i].user_name+'">'
+			+obj[i].user_name+'</a></small> <small>'+obj[i].vist_times+'人访问</small></h3>'
+			+'<p>'+obj[i].algorithm_describe+'</p>'
+	);
+	}
+	
+	$('.fliper').html(//翻页按钮
+			'<div class="fanye" style="margin:10px,20px">'
+			+'<a href="javascript:void(0)"  onclick="pre2Index()"> 上一页  </a>'
+			+'<small> 第 '+cu_index+' 页 </small>'
+			+'<a href="javascript:void(0)"  onclick="aft2Index()"> 下一页  </a></div>'
+			
+	);
+}
+
+function pre2Index(){//上一页
+	var input = document.getElementById("searchKeywords");
+	var searchAlgo = input.value;
+	var index = cu_index;
+	if(index<=1){index=1;}else{index=index-1;}
+	//alert(searchAlgo);
+	//alert(index);
+	$.post('SearchAlgoAction',{'searchAlgo':searchAlgo,'currentIndex':index},callback_pre2);
+}
+function callback_pre2(data){
+	var obj = eval('('+data+')');
+	var algList = obj.cuArrAlgs;
+	cu_index = obj.currentIndex;
+	$('.algList').html('');
+	for(var i=0;i<algList.length;i++){
+		//替換掉原來的內容
+		$('.algList').append(
+				'<h3><a href="algoView.jsp?alg_id='+algList[i].algorithm_id+'" style="text-decoration:none">'
+				+algList[i].algorithm_name+'</a><small> <a href="userCenter.jsp?username='
+				+algList[i].user_name+'">'
+				+algList[i].user_name+'</a></small> <small>'+algList[i].vist_times+'人访问</small></h3>'
+				+'<p>'+algList[i].algorithm_describe+'</p>'
+				);
+	}
+	$('.fliper').html(//翻页按钮
+			'<div class="fanye" style="margin:10px,20px">'
+			+'<a href="javascript:void(0)"  onclick="pre2Index()"> 上一页 </a>'
+			+'<small>第 '+cu_index+' 页</small>'
+			+'<a href="javascript:void(0)"  onclick="aft2Index()">下一页 </a></div>'
+			
+	);
+}
+
+function aft2Index(){
+	var input = document.getElementById("searchKeywords");
+	var searchAlgo = input.value;
+	//alert(searchAlgo);
+	var index = cu_index;
+	var totalPage = total_pages;
+	//alert(totalPage);
+	if(index>=totalPage){index=totalPage;}else{index=index+1;}
+	$.post('SearchAlgoAction',{'searchAlgo':searchAlgo,'currentIndex':index},callback_aft2);
+}
+
+function callback_aft2(data){
+	var obj = eval('('+data+')');
+	var algList = obj.cuArrAlgs;
+	cu_index =  obj.currentIndex;
+	$('.algList').html('');
+	for(var i=0;i<algList.length;i++){
+		//替換掉原來的內容
+		$('.algList').append(
+				'<h3><a href="algoView.jsp?alg_id='+algList[i].algorithm_id+'" style="text-decoration:none">'
+				+algList[i].algorithm_name+'</a><small> <a href="userCenter.jsp?username='
+				+algList[i].user_name+'">'
+				+algList[i].user_name+'</a></small> <small>'+algList[i].vist_times+'人访问</small></h3>'
+				+'<p>'+algList[i].algorithm_describe+'</p>'
+				);
+	}
+	$('.fliper').html(//翻页按钮
+			'<div class="fanye" style="margin:10px,20px">'
+			+'<a href="javascript:void(0)"  onclick="pre2Index()"> 上一页 </a>'
+			+'<small>第 '+cu_index+' 页</small>'
+			+'<a href="javascript:void(0)"  onclick="aft2Index()">下一页 </a></div>'
+			
+	);
+}
+
+//算法列表
+$(function() {
+	$.post('algthmActionFetch_j', {},cuIndex_ready);
+
+});
+function cuIndex_ready(data) {
+	var obj = eval('(' + data + ')');
+	var currentIndex = obj.currentIndex;
+	var totalpage = obj.totalPage;
+	cu_index = currentIndex;
+	total_pages =totalpage;
+	var algsList = obj.cuArrAlgs;
+	cuIndex_readyfp(algsList);
+}
+function cuIndex_readyfp(obj) {
+	for ( var i = 0; i < obj.length; i++) {
+
+	$('.algList').append(//当前页算法列表
+			'<h3><a href="algoView.jsp?alg_id='+obj[i].algorithm_id+'" style="text-decoration:none">'
+			+obj[i].algorithm_name+'</a><small> <a href="userCenter.jsp?username='
+			+obj[i].user_name+'">'
+			+obj[i].user_name+'</a></small> <small>'+obj[i].vist_times+'人访问</small></h3>'
+			+'<p>'+obj[i].algorithm_describe+'</p>'
+	);
+	}
+	
+	$('.fliper').html(//翻页按钮
+			'<div class="fanye" style="margin:10px,20px">'
+			+'<a href="javascript:void(0)"  onclick="preIndex()"> 上一页  </a>'
+			+'<small> 第 '+cu_index+' 页 </small>'
+			+'<a href="javascript:void(0)"  onclick="aftIndex()"> 下一页  </a></div>'
+			
+	);
+}
+
+
+
+function preIndex(){//上一页
+	var index = cu_index;
+	if(index<=1){index=1;}else{index=index-1;}
+	$.post('algthmActionFetch_j',{'currentIndex':index},callback_pre);
+}
+function callback_pre(data){
+	var obj = eval('('+data+')');
+	var algList = obj.cuArrAlgs;
+	cu_index = obj.currentIndex;
+	$('.algList').html('');
+	for(var i=0;i<algList.length;i++){
+		//替換掉原來的內容
+		$('.algList').append(
+				'<h3><a href="algoView.jsp?alg_id='+algList[i].algorithm_id+'" style="text-decoration:none">'
+				+algList[i].algorithm_name+'</a><small> <a href="userCenter.jsp?username='
+				+algList[i].user_name+'">'
+				+algList[i].user_name+'</a></small> <small>'+algList[i].vist_times+'人访问</small></h3>'
+				+'<p>'+algList[i].algorithm_describe+'</p>'
+				);
+	}
+	$('.fliper').html(//翻页按钮
+			'<div class="fanye" style="margin:10px,20px">'
+			+'<a href="javascript:void(0)"  onclick="preIndex()"> 上一页 </a>'
+			+'<small>第 '+cu_index+' 页</small>'
+			+'<a href="javascript:void(0)"  onclick="aftIndex()">下一页 </a></div>'
+			
+	);
+}
+function aftIndex(){
+	var index = cu_index;
+	var totalPage = total_pages;
+	if(index>=totalPage){index=totalPage;}else{index=index+1;}
+	$.post('algthmActionFetch_j',{currentIndex:index},callback_aft);
+}
+function callback_aft(data){
+	var obj = eval('('+data+')');
+	var algList = obj.cuArrAlgs;
+	cu_index =  obj.currentIndex;
+	$('.algList').html('');
+	for(var i=0;i<algList.length;i++){
+		//替換掉原來的內容
+		$('.algList').append(
+				'<h3><a href="algoView.jsp?alg_id='+algList[i].algorithm_id+'" style="text-decoration:none">'
+				+algList[i].algorithm_name+'</a><small> <a href="userCenter.jsp?username='
+				+algList[i].user_name+'">'
+				+algList[i].user_name+'</a></small> <small>'+algList[i].vist_times+'人访问</small></h3>'
+				+'<p>'+algList[i].algorithm_describe+'</p>'
+				);
+	}
+	$('.fliper').html(//翻页按钮
+			'<div class="fanye" style="margin:10px,20px">'
+			+'<a href="javascript:void(0)"  onclick="preIndex()"> 上一页 </a>'
+			+'<small>第 '+cu_index+' 页</small>'
+			+'<a href="javascript:void(0)"  onclick="aftIndex()">下一页 </a></div>'
+			
+	);
+}
+
+//标签栏显示
+$(function() {
+	$.post('AlgthmTagsActionFetch_j',{},showTags);
+	//alert('ok');
+});
+function showTags(data){
+	//alert('thx');
+	var obj = eval('(' + data + ')');
+	var tagList = obj.tagsName;
+	$('.tagList').empty();
+	//alert('ok');
+	//$('.tagList').html('');
+	for(var i = 0; i < tagList.length; i++){
+		//alert(tagList[i].tag_name);
+		//显示标签
+		//var tname = tagList[i].tag_name;
+		$('.tagList').append(
+			'<a href="tagSearch.jsp?tname=\''+tagList[i].tag_id+'\'">'+tagList[i].tag_name+'</a>'
+		);
+	}
+}
+
+//标签搜索框筛选标签
+function changeTag(){ 
+var matchTag=$("#webtest").val();
+//alert(matchTag);
+$.post('MatchTagsAction',{"matchTag":matchTag},showTags)
+} 
+
+//分类栏显示
+$(function() {
+	$.post('algTypeAction',{},showTypes);
+	//alert('ok');
+});
+function showTypes(data){
+	var obj = eval('(' + data + ')');
+	console.log("type===="+data);
+	var typeList = obj.typeName;
+	console.log("typeList===="+JSON.stringify(typeList));
+	$('.typeList').empty();
+	for(var i = 0; i < typeList.length; i++){
+		$('.typeList').append(
+			'<tr><td><a href="TypeSearch.jsp?typename=\''+typeList[i].type_id+'\'">'+typeList[i].type_name+'&nbsp&nbsp('+typeList[i].count+')</a></td></tr>'
+		);
+	}
+}
+</script>
+ <%
+  	ArrayList<Algorithm> cuArrAlg = (ArrayList<Algorithm>)request.getAttribute("cuArrAlgs");
+
+  	int totalPage= (Integer)request.getAttribute("totalPage_a");
+  	
+  	int currentIndex =(Integer)request.getAttribute("currentIndex_a");
+  	
+  	ArrayList<AlgorithmTags> tagsName = (ArrayList<AlgorithmTags>)request.getAttribute("tagsName");
+
+  %>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="panel panel-primary">
+                            <div class="panel-heading">
+                				<h3 class="panel-title">分类目录</h3>
+             				</div>
+                                <div class="panel-body">
+                                    <div class="skillset">
+                               			<table class="typeList">
+                               			</table>
+                            		</div> 
+                                </div><!--
+                                <div class="text-center">
+                                    <a href="#"><i class="fa fa-plus"></i>添加类别</a>
+                                </div>-->
+                            </div>
+                            <hr />
+                            <div class="panel panel-primary">
+                            <div class="panel-heading">
+                				<h3 class="panel-title">标签搜索</h3>
+             				</div>
+                                <div class="panel-body listTag">
+                                    <ul class="list-unstyled ">
+                                		<li><input class="searchTags" style="width:100%;" type="search"  id="webtest" oninput="changeTag();" onpropertychange="changeTag();"/>
+                                		
+                                		<!--<li>里可以放<a>循环，动态显示关键字-->
+                                		<li></li>
+                                		<li style="text-align:center">
+                                		<div class="tagList"></div>
+                                		</li>
+                                		<!--<li style="text-align:center"><a href="tagSearch.jsp"></a>
+                                		</li>-->
+                            		</ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-9">
+                    <!-- 搜索算法 -->
+                    <div class="well">
+                        <h2>搜索算法</h2>
+                            <div class="form-group">
+                                <input type="search" class="form-control search " name="searchKeywords" value="输入算法关键字" id="searchKeywords"
+                                onfocus="if (value =='输入算法关键字'){value =''}" onblur="if (value ==''){value='输入算法关键字'}"
+                                onkeypress="if(event.keyCode==13){btn.click();}">
+                            </div>
+                     
+                        <button type="submit" class="btn btn-primary" name=" btn" id="btn" onclick="searchResult();">搜索</button>
+                    </div>
+                    <hr>
+
+					<div class="algList"></div>
+					<div class="fliper"></div>
+                    <!-- 算法列表 -->
+                  
+                 <br>
+            
+            <hr>
+                </div>
+            </div>
+        </div>
+<jsp:include page="<%=M.j_tail%>" />

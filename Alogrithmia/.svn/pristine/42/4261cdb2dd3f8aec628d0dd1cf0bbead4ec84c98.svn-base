@@ -1,0 +1,160 @@
+package alg.base.action;
+
+import java.util.ArrayList;
+
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRequestEvent;
+import javax.servlet.ServletRequestListener;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionAttributeListener;
+import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.HttpSessionEvent;
+import javax.servlet.http.HttpSessionListener;
+
+import org.comet4j.core.CometConnection;
+import org.comet4j.core.CometContext;
+import org.comet4j.core.CometEngine;
+import org.comet4j.core.event.ConnectEvent;
+import org.comet4j.core.listener.ConnectListener;
+
+import alg.base.bean.Comment;
+import alg.base.bean.Respond;
+import alg.base.bean.cometBean;
+import alg.base.service.CommentService;
+import alg.base.util.cometNumberListener;
+
+public class PushCommet implements ServletContextListener{
+	
+	private static final String CHANNEL = "hello";
+    public void contextInitialized(ServletContextEvent arg0) {
+        CometContext cc = CometContext.getInstance();
+        CometEngine engine = cc.getEngine();
+        cc.registChannel(CHANNEL);//注册应用的channel
+      //  engine.addConnectListener(new cometNumberListener());
+}
+
+	/*
+    public void requestInitialized(ServletRequestEvent sre) {
+    	
+    	  int num=0;
+      HttpServletRequest request=(HttpServletRequest) sre.getServletRequest();
+      HttpSession RequestSession = request.getSession();
+   //   Thread helloAppModule = new Thread(new HelloAppModule(request), "Sender App Module");
+     
+   //          helloAppModule.setDaemon(true);
+  //           helloAppModule.start();    
+           
+    
+      try{
+    	  String userId=Integer.toString((Integer)session.getAttribute("id"));
+    	  System.out.println("id是："+session.getAttribute("id"));
+    	  helloAppModule.start();
+      } 
+      catch(Exception e){
+    	  if( helloAppModule.isAlive()){
+   		   helloAppModule.stop();
+   	   }  
+      }
+      
+    }
+    
+    public void sessionCreated(HttpSessionEvent event) {   
+
+    }   
+   public void sessionDestroyed(HttpSessionEvent event) {   
+  
+    }   
+   public void attributeAdded(HttpSessionBindingEvent se) {   
+        HttpSession session=se.getSession();
+        if(session.getAttribute("id")!=null){
+        	System.out.println("sessionAdd"+session.getAttribute("id"));
+            Thread helloAppModule = new Thread(new HelloAppModule(session), "Sender App Module");
+            if(helloAppModule!=null){
+           // helloAppModule.setDaemon(true);
+           helloAppModule.start(); 
+            }
+        }
+       
+   }   
+ 
+   public void attributeRemoved(HttpSessionBindingEvent se) {  
+	   HttpSession session=se.getSession();
+       if(session.getAttribute("id")!=null){
+    	   System.out.println("session 停了");
+    	   Thread helloAppModule = new Thread(new HelloAppModule(session), "Sender App Module");
+    	   helloAppModule.stop();
+       }
+      
+   }   
+ 
+   public void attributeReplaced(HttpSessionBindingEvent se) {   
+   }   
+
+    class HelloAppModule implements Runnable {
+    	 private HttpSession session;
+    	 public HelloAppModule(HttpSession session){
+    		 this.session=session;
+    	 }
+            public void run()  {
+                    while (true) {
+                            
+                            int num=0;
+                            
+                            CometEngine engine = CometContext.getInstance().getEngine();
+                         //   engine.addConnectListener(new JoinListener());
+                            String userId=Integer.toString((Integer)session.getAttribute("id"));
+                            System.out.println("id is:"+session.getAttribute("id"));
+                           
+                            CommentService cm=new CommentService();
+                        	ArrayList<Comment> com = null;
+							try {
+								com = cm.getAllComment(userId);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+                        	ArrayList<Respond> res = null;
+							try {
+								res = cm.getRespond(userId);
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+                        	num=com.size()+res.size();
+                        	System.out.println("size1的值:"+com.size()+"size2:"+res.size());
+                        	String number=String.valueOf(num);
+                          //  engine.sendTo(CHANNEL,engine.getConnection(request),num);
+                        	cometBean comet=new cometBean();
+                        	comet.setId(userId);
+                        	comet.setNum(num);
+                        	 engine.sendToAll(CHANNEL,comet);
+                     
+                        	
+   	
+                            System.out.println("剩余："+number);
+                            
+                            try {
+                                Thread.sleep(10000);
+                        } catch (Exception ex) {
+                                ex.printStackTrace();
+                        }
+                    }
+            }
+    }
+    
+
+    public void  requestDestroyed(ServletRequestEvent sre) {
+    	*//**HttpServletRequest request=(HttpServletRequest) sre.getServletRequest();
+    	System.out.println(request);	
+        Thread helloAppModule = new Thread(new HelloAppModule(request), "Sender ");
+        helloAppModule.stop();**//*
+    }
+    
+*/    public void contextDestroyed(ServletContextEvent arg0) {
+
+    }
+
+}
+

@@ -1,0 +1,173 @@
+package alg.base.action;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import javax.servlet.http.HttpServletRequest;
+
+import net.sf.json.JSONObject;
+
+import org.apache.struts2.ServletActionContext;
+import alg.base.util.EmailUtils;
+
+import alg.base.bean.usersbean;
+import alg.base.service.UserService;
+import alg.base.util.ConfigurationConstant;
+import alg.base.util.DatabaseTool;
+import alg.base.util.FlushTool;
+import alg.base.util.GenerateLinkUtils;
+
+import com.opensymphony.xwork2.ActionSupport;
+
+public class LoginAction extends ActionSupport{
+	private String username;
+	private String password;
+	private String user_mail;
+	private String sid;
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getUser_mail() {
+		return user_mail;
+	}
+	public void setUser_mail(String user_mail) {
+		this.user_mail = user_mail;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	HttpServletRequest request = ServletActionContext.getRequest();
+	HttpServletResponse response=ServletActionContext.getResponse();
+	 HttpSession session = request.getSession();
+	 public String execute() throws Exception{
+		 
+		 
+		 
+		  usersbean flag= login(username,password);
+		   if(flag!=null){
+			 session.setAttribute("user", flag.getUser_name()); 
+			 session.setAttribute("id", flag.getUser_id());
+			 session.setAttribute("sex", flag.getUser_sex());
+			 session.setAttribute("mail", flag.getUser_mail());
+			 session.setAttribute("userInfor",flag );
+			 session.setAttribute("client_url", ConfigurationConstant.ALOGSERVER_URL);
+			 session.setAttribute("level", flag.getLevel());
+			 
+			 System.out.println("222222222level=="+ flag.getLevel());
+		   return SUCCESS;
+		   }
+		  else
+			   request.setAttribute("errorMsg", "用户名或者密码错误");
+		   return LOGIN;
+	
+		 }
+	public void clear_session(){
+		 session.setAttribute("user", null); 
+		 session.setAttribute("level", null);
+		 session.setAttribute("id",null );
+		 session.setAttribute("sex", null);
+		 session.setAttribute("mail", null);
+		 session.setAttribute("userInfor",null );
+		
+		
+	}
+	
+	public usersbean login(String username,String password) throws Exception{
+	//	boolean flag=false;
+		String sql = "select * from users where user_name = ? and user_pwd= ?";
+		String p[] = {username,password};
+		System.out.println(username);
+		System.out.println(password);
+		ResultSet rs = DatabaseTool.query(sql, p);
+		try {
+			if (rs != null) {
+				while (rs.next()) {
+					usersbean us=new usersbean();
+					us.setUser_id(rs.getInt("user_id"));
+					us.setUser_name(rs.getString("user_name"));
+					us.setUser_mail(rs.getString("user_mail"));
+					us.setUser_pwd(rs.getString("User_pwd"));
+					us.setUser_sex(rs.getString("User_sex"));
+					us.setUser_credit(rs.getInt("user_credit"));
+					us.setLevel(rs.getInt("level"));
+					System.out.println("level ====" +rs.getInt("level") );
+				return us;
+					
+				}
+			}
+			else {
+				return null;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public void resetpwd()throws Exception{
+		UserService user=new UserService();
+		usersbean us=user.findUserbyEmail(user_mail);
+		// 发送重新设置密码的链接
+		EmailUtils.sendResetPasswordEmail(us);
+		request.setAttribute("sendMailMsg", "您的申请已提交成功，请查看您的"+us.getUser_mail()+"邮箱。");
+		request.getRequestDispatcher("forgotPwdSuccess.jsp").forward(request, response);
+	}
+	
+	public void checkResetLink() throws Exception{
+		System.out.println(sid);
+		if (sid.equals("")  || username.equals("")) {
+			request.setAttribute("mesg", "链接不完整,请重新生成");
+            System.out.println(">>>>> null");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+            
+	}
+		UserService us=new UserService();
+		usersbean ub=us.findUserbyName(username);
+		Timestamp outDate=(Timestamp)ub.getOutDate();
+		System.out.println("outDate>>>"+outDate);
+        if(outDate.getTime() <= System.currentTimeMillis()){ //表示已经过期
+            request.setAttribute("mesg", "链接已经过期,请重新申请找回密码.");
+            System.out.println("时间 超时");
+            request.getRequestDispatcher("error.jsp").forward(request, response);
+           
+        }
+        
+        String key = ub.getUser_name()+"$"+outDate.getTime()/1000*1000+"$"+ub.getValidataCode();//数字签名
+        String key1=key.replace(" ", "");
+        System.out.println("key link》》"+key1);
+        String digitalSignature = new GenerateLinkUtils().md5(key1);// 数字签名
+        System.out.println("digitalSignature>>>>"+digitalSignature);
+        if(!digitalSignature.equals(sid)) {
+        	 request.setAttribute("mesg", "链接不正确,是否已经过期了?重新申请吧.");
+                System.out.println("标示不正确");
+                request.getRequestDispatcher("error.jsp").forward(request, response);
+              
+        }else {
+          //链接验证通过 转到修改密码页面
+        	 request.setAttribute("user", ub);
+        	 request.getRequestDispatcher("resetHandle.jsp").forward(request, response);
+          
+      }
+  }
+	public String getSid() {
+		return sid;
+	}
+	public void setSid(String sid) {
+		this.sid = sid;
+	}
+}
+
+
+
